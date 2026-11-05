@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cerita Pendek - Belajar Membaca Kelas 3 SD</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(160deg, #dff1ff 0%, #fff6e0 100%);
+    color: #123;
+  }
+  .app {
+    width: 100%; max-width: 680px;
+    background: #fff; border-radius: 26px;
+    box-shadow: 0 14px 34px rgba(0, 70, 130, .13);
+    padding: 20px 20px 24px;
+  }
+  h1 { margin: 0 0 2px; font-size: 1.1rem; text-align: center; color: #0b6ea8; }
+  .sub { text-align: center; font-size: .76rem; color: #7a8fa1; margin-bottom: 12px; }
+
+  .progress {
+    text-align: center; font-size: .78rem; font-weight: 700;
+    color: #0b6ea8; background: #eaf6ff;
+    border-radius: 999px; padding: 5px 14px;
+    display: block; width: fit-content; margin: 0 auto 12px;
+  }
+
+  .kartu {
+    border: 3px dashed #b9dcf5; border-radius: 20px;
+    background: #f8fcff; padding: 18px 16px 20px;
+  }
+  .judul-cerita {
+    margin: 0 0 10px; font-size: 1.05rem; font-weight: 800;
+    color: #d2691e; text-align: center;
+  }
+  #teks { font-size: clamp(1rem, 3.6vw, 1.22rem); line-height: 1.9; color: #163a52; }
+  .kalimat {
+    display: block; padding: 4px 8px; margin: 0 -8px 4px;
+    border-radius: 10px; cursor: pointer;
+    transition: background .15s;
+  }
+  .kalimat:hover { background: #eef8ff; }
+  .kalimat.sedang { background: #e2f3ff; }
+  .kata { cursor: pointer; padding: 1px 3px; border-radius: 6px; transition: background .12s, color .12s; }
+  .kata:hover { background: #d6ecff; }
+  .kata.aktif { background: #ffd93d; color: #1a1a1a; }
+
+  .pesan {
+    margin-top: 14px; font-size: .8rem; line-height: 1.5;
+    background: #eafff1; color: #1c6b45;
+    border-left: 4px solid #56c98a; border-radius: 10px;
+    padding: 9px 12px;
+  }
+  .pesan b { color: #12804f; }
+
+  .kontrol { display: flex; gap: 10px; margin-top: 16px; }
+  .btn {
+    flex: 1; border: none; border-radius: 14px; cursor: pointer;
+    padding: 14px 10px; font-size: .95rem; font-weight: 700;
+    font-family: inherit; transition: transform .08s, filter .15s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-utama { background: #1a9be0; color: #fff; box-shadow: 0 4px 0 #1178ae; }
+  .btn-utama:hover { filter: brightness(1.06); }
+  .btn-sekunder { background: #eef4f8; color: #2b5b7a; }
+  .btn-sekunder:hover { background: #e2edf5; }
+
+  .nav { display: flex; gap: 10px; margin-top: 10px; }
+  .nav .btn { padding: 11px 8px; font-size: .84rem; }
+
+  .pengaturan {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 16px; font-size: .8rem; color: #5b7285; font-weight: 600;
+  }
+  input[type=range] { flex: 1; accent-color: #1a9be0; }
+  #kecepatanLabel { min-width: 42px; text-align: right; color: #0b6ea8; }
+
+  .info { margin-top: 12px; font-size: .72rem; color: #93a6b5; text-align: center; line-height: 1.6; }
+  .peringatan {
+    margin-top: 10px; font-size: .75rem; color: #a06a00;
+    background: #fff5d6; border-radius: 10px; padding: 8px 10px; display: none;
+  }
+  .daftar {
+    margin-top: 16px; border-top: 1px solid #eef3f7; padding-top: 12px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .chip {
+    border: 1px solid #d7e6f2; background: #fff; color: #3d637d;
+    border-radius: 999px; padding: 6px 11px; font-size: .72rem;
+    cursor: pointer; font-family: inherit; font-weight: 700;
+  }
+  .chip.aktif { background: #1a9be0; border-color: #1a9be0; color: #fff; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>📖 Cerita Pendek untuk Membaca</h1>
+  <p class="sub">Kelas 3 SD &middot; klik kalimat untuk membacanya</p>
+
+  <span class="progress" id="progress">Cerita 1 dari 1</span>
+
+  <div class="kartu">
+    <h2 class="judul-cerita" id="judul">Judul</h2>
+    <div id="teks"></div>
+  </div>
+
+  <div class="pesan" id="pesan"></div>
+
+  <div class="kontrol">
+    <button class="btn btn-utama" id="btnBaca">🔊 Bacakan</button>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-sekunder" id="btnPrev">◀ Cerita Sebelumnya</button>
+    <button class="btn btn-sekunder" id="btnNext">Cerita Berikutnya ▶</button>
+  </div>
+
+  <div class="pengaturan">
+    <label for="kecepatan">🐢 Kecepatan</label>
+    <input type="range" id="kecepatan" min="0.5" max="1.3" step="0.1" value="0.85">
+    <span id="kecepatanLabel">0.9x</span>
+  </div>
+
+  <div class="peringatan" id="peringatan">
+    Suara bahasa Indonesia tidak tersedia di perangkat ini. Aplikasi tetap
+    mencoba memakai suara bawaan — sebaiknya gunakan Google Chrome.
+  </div>
+
+  <div class="info">
+    <b>Bacakan</b> = membaca seluruh cerita &middot; <b>klik kalimat</b> = baca kalimat itu &middot;
+    <b>klik kata</b> = dengar katanya
+  </div>
+
+  <div class="daftar" id="daftar"></div>
+</div>
+
+<script>
+/* ================= DATA CERITA ================= */
+const cerita = [
+  {
+    judul: "Semut dan Belalang",
+    kalimat: [
+      "Sepanjang musim panas, semut bekerja keras mengumpulkan makanan.",
+      "Belalang hanya bernyanyi dan bersenang-senang setiap hari.",
+      "Ia malah menertawakan semut yang selalu sibuk.",
+      "Ketika musim hujan tiba, makanan menjadi sangat sulit dicari.",
+      "Belalang kelaparan dan menyesali perbuatannya.",
+      "Semut yang baik hati mau berbagi makanannya."
+    ],
+    pesan: "Rajinlah bekerja dan menabung untuk masa depan."
+  },
+  {
+    judul: "Kura-Kura dan Kelinci",
+    kalimat: [
+      "Seekor kelinci yang sombong menantang kura-kura untuk berlomba lari.",
+      "Kelinci berlari sangat cepat, lalu tidur di bawah pohon.",
+      "Kura-kura berjalan pelan, tetapi tidak pernah berhenti.",
+      "Akhirnya kura-kura sampai lebih dulu di garis akhir.",
+      "Kelinci terbangun dan sangat menyesal."
+    ],
+    pesan: "Jangan sombong dan jangan mudah menyerah."
+  },
+  {
+    judul: "Singa dan Tikus",
+    kalimat: [
+      "Seekor singa tertidur lelap di bawah pohon yang rindang.",
+      "Tikus kecil tidak sengaja melompat ke atas badan singa.",
+      "Singa marah dan hendak memakan tikus itu.",
+      "Tikus memohon dan berjanji akan menolong singa suatu hari.",
+      "Beberapa hari kemudian, singa terjerat jaring pemburu.",
+      "Tikus datang dan menggerogoti jaring itu sampai putus."
+    ],
+    pesan: "Jangan meremehkan kebaikan dari siapa pun."
+  },
+  {
+    judul: "Gagak dan Kendi",
+    kalimat: [
+      "Seekor gagak kehausan di tengah hari yang panas.",
+      "Ia menemukan kendi berisi air, tetapi airnya terlalu dalam.",
+      "Gagak memasukkan kerikil satu per satu ke dalam kendi.",
+      "Air pun naik sedikit demi sedikit sampai ke mulut kendi.",
+      "Gagak minum dengan puas dan terbang kembali."
+    ],
+    pesan: "Dengan akal dan kesabaran, masalah bisa diselesaikan."
+  },
+  {
+    judul: "Rubah dan Anggur",
+    kalimat: [
+      "Seekor rubah melihat anggur ranum di pohon yang tinggi.",
+      "Ia melompat berkali-kali, tetapi tidak bisa mencapainya.",
+      "Rubah lalu berkata bahwa anggur itu pasti masam.",
+      "Ia berjalan pergi dengan perut yang kosong."
+    ],
+    pesan: "Jangan mencari alasan untuk menutupi kegagalan."
+  },
+  {
+    judul: "Anjing dan Bayangannya",
+    kalimat: [
+      "Seekor anjing membawa tulang di dalam mulutnya.",
+      "Ia melewati sebuah jembatan di atas sungai.",
+      "Anjing melihat bayangannya sendiri di dalam air.",
+      "Ia mengira ada anjing lain membawa tulang yang lebih besar.",
+      "Anjing menggonggong, dan tulangnya jatuh ke sungai."
+    ],
+    pesan: "Bersyukurlah dengan apa yang sudah kita miliki."
+  },
+  {
+    judul: "Angin dan Matahari",
+    kalimat: [
+      "Angin dan matahari bertengkar tentang siapa yang paling kuat.",
+      "Mereka melihat seorang pengembara memakai mantel tebal.",
+      "Angin meniup kencang, tetapi mantel itu makin dipegang erat.",
+      "Matahari bersinar hangat, dan pengembara melepas mantelnya.",
+      "Matahari pun menang tanpa harus bertengkar."
+    ],
+    pesan: "Kelembutan lebih kuat daripada kekerasan."
+  },
+  {
+    judul: "Semut dan Merpati",
+    kalimat: [
+      "Seekor semut terjatuh ke dalam sungai yang deras.",
+      "Merpati melihatnya dan menjatuhkan sehelai daun.",
+      "Semut naik ke daun itu dan akhirnya selamat.",
+      "Kemudian seorang pemburu membidik merpati dengan senapan.",
+      "Semut menggigit kaki pemburu, dan merpati terbang menjauh."
+    ],
+    pesan: "Kebaikan akan dibalas dengan kebaikan."
+  }
+];
+
+/* ================= ELEMEN ================= */
+const elJudul      = document.getElementById('judul');
+const elTeks       = document.getElementById('teks');
+const elPesan      = document.getElementById('pesan');
+const elProgress   = document.getElementById('progress');
+const elBaca       = document.getElementById('btnBaca');
+const elPrev       = document.getElementById('btnPrev');
+const elNext       = document.getElementById('btnNext');
+const elDaftar     = document.getElementById('daftar');
+const elSlider     = document.getElementById('kecepatan');
+const elSliderLbl  = document.getElementById('kecepatanLabel');
+const elPeringatan = document.getElementById('peringatan');
+
+/* ================= STATE ================= */
+const synth = window.speechSynthesis;
+let idxCerita  = 0;
+let idxKalimat = 0;
+let rate       = 0.85;
+let bermain    = false;
+let gen        = 0;
+let voices     = [];
+
+/* ================= SUARA ================= */
+function muatSuara() {
+  voices = synth ? synth.getVoices() : [];
+  const adaIndo = voices.some(v => /^id/i.test(v.lang));
+  elPeringatan.style.display = (voices.length && !adaIndo) ? 'block' : 'none';
+}
+if (synth) {
+  muatSuara();
+  synth.onvoiceschanged = muatSuara;
+}
+
+function pilihSuara() {
+  const indo = voices.filter(v => /^id/i.test(v.lang));
+  if (indo.length) {
+    const natural = indo.find(v => /damayanti|gadis|female|wanita|natural/i.test(v.name));
+    return natural || indo[0];
+  }
+  return null;
+}
+
+/* ================= RENDER ================= */
+function render() {
+  const d = cerita[idxCerita];
+
+  elJudul.textContent = d.judul;
+  elPesan.innerHTML = '<b>Pesan cerita:</b> ' + d.pesan;
+  elProgress.textContent = `Cerita ${idxCerita + 1} dari ${cerita.length}`;
+
+  elTeks.innerHTML = '';
+  d.kalimat.forEach((kal, i) => {
+    const wrap = document.createElement('span');
+    wrap.className = 'kalimat';
+    wrap.dataset.i = i;
+
+    let pos = 0;
+    kal.split(/(\s+)/).forEach(bagian => {
+      if (/^\s+$/.test(bagian)) {
+        wrap.appendChild(document.createTextNode(bagian));
+        pos += bagian.length;
+      } else {
+        const s = document.createElement('span');
+        s.className = 'kata';
+        s.textContent = bagian;
+        s.dataset.mulai = pos;
+        s.dataset.akhir = pos + bagian.length;
+        pos += bagian.length;
+        s.addEventListener('click', ev => {
+          ev.stopPropagation();
+          bacaSatuKata(bagian);
+        });
+        wrap.appendChild(s);
+      }
+    });
+
+    // klik area kalimat (bukan kata) -> bacakan kalimat ini
+    wrap.addEventListener('click', () => mulai(i));
+
+    elTeks.appendChild(wrap);
+  });
+
+  perbaruiDaftar();
+  elPrev.style.opacity = idxCerita === 0 ? .45 : 1;
+  elNext.style.opacity = idxCerita === cerita.length - 1 ? .45 : 1;
+}
+
+function perbaruiDaftar() {
+  elDaftar.innerHTML = '';
+  cerita.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (i === idxCerita ? ' aktif' : '');
+    b.textContent = i + 1;
+    b.title = c.judul;
+    b.addEventListener('click', () => pindah(i));
+    elDaftar.appendChild(b);
+  });
+}
+
+/* ================= SOROTAN ================= */
+function bersihkanSorot() {
+  elTeks.querySelectorAll('.kata.aktif').forEach(s => s.classList.remove('aktif'));
+  elTeks.querySelectorAll('.kalimat.sedang').forEach(s => s.classList.remove('sedang'));
+}
+
+function sorotKata(iKalimat, charIndex) {
+  const wrap = elTeks.querySelector(`.kalimat[data-i="${iKalimat}"]`);
+  if (!wrap) return;
+  wrap.querySelectorAll('.kata').forEach(s => s.classList.remove('aktif'));
+  for (const s of wrap.querySelectorAll('.kata')) {
+    const mulai = +s.dataset.mulai, akhir = +s.dataset.akhir;
+    if (charIndex >= mulai && charIndex < akhir) {
+      s.classList.add('aktif');
+      s.scrollIntoView({ block: 'nearest' });
+      break;
+    }
+  }
+}
+
+function tandaiKalimat(iKalimat) {
+  elTeks.querySelectorAll('.kalimat').forEach(k => k.classList.remove('sedang'));
+  const wrap = elTeks.querySelector(`.kalimat[data-i="${iKalimat}"]`);
+  if (wrap) wrap.classList.add('sedang');
+}
+
+/* ================= PEMBACAAN ================= */
+function mulai(dari) {
+  if (!synth) { alert('Browser ini tidak mendukung fitur suara (TTS).'); return; }
+  berhenti();
+  bermain = true;
+  const myGen = gen;
+  idxKalimat = dari || 0;
+  elBaca.textContent = '⏹ Berhenti';
+  // jeda kecil supaya cancel() benar-benar selesai di Chrome
+  setTimeout(() => bacaKalimat(idxKalimat, myGen), 100);
+}
+
+function bacaKalimat(i, g) {
+  if (g !== gen || !bermain) return;
+  const kalimat = cerita[idxCerita].kalimat;
+
+  if (i >= kalimat.length) { selesai(); return; }
+
+  idxKalimat = i;
+  elProgress.textContent =
+    `Cerita ${idxCerita + 1} dari ${cerita.length} · kalimat ${i + 1}/${kalimat.length}`;
+
+  const u = new SpeechSynthesisUtterance(kalimat[i]);
+  u.lang = 'id-ID';
+  u.rate = rate;
+  u.pitch = 1;
+  const v = pilihSuara();
+  if (v) u.voice = v;
+
+  u.onstart = () => {
+    if (g !== gen) return;
+    tandaiKalimat(i);
+  };
+  u.onboundary = e => {
+    if (g !== gen) return;
+    if (typeof e.charIndex === 'number') sorotKata(i, e.charIndex);
+  };
+  u.onend = () => {
+    if (g !== gen || !bermain) return;
+    // jeda antar kalimat supaya anak sempat mengikuti
+    setTimeout(() => bacaKalimat(i + 1, g), 350);
+  };
+  u.onerror = () => {
+    if (g !== gen) return;
+    selesai();
+  };
+
+  synth.speak(u);
+}
+
+function bacaSatuKata(kata) {
+  if (!synth) return;
+  berhenti();
+  const bersih = kata.replace(/[^\w\sÀ-ÿ]/g, '');
+  if (!bersih.trim()) return;
+
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(bersih);
+    u.lang = 'id-ID';
+    u.rate = Math.max(0.6, rate - 0.2);
+    const v = pilihSuara();
+    if (v) u.voice = v;
+    synth.speak(u);
+  }, 80);
+}
+
+function selesai() {
+  bermain = false;
+  gen++;
+  elBaca.textContent = '🔊 Bacakan';
+  bersihkanSorot();
+  elProgress.textContent = `Cerita ${idxCerita + 1} dari ${cerita.length}`;
+}
+
+function berhenti() {
+  bermain = false;
+  gen++;
+  if (synth) synth.cancel();
+  elBaca.textContent = '🔊 Bacakan';
+  bersihkanSorot();
+  elProgress.textContent = `Cerita ${idxCerita + 1} dari ${cerita.length}`;
+}
+
+/* ================= NAVIGASI ================= */
+function pindah(i) {
+  if (i < 0 || i >= cerita.length) return;
+  berhenti();
+  idxCerita = i;
+  idxKalimat = 0;
+  render();
+}
+
+elBaca.addEventListener('click', () => {
+  if (bermain) berhenti();
+  else mulai(0);
+});
+
+elPrev.addEventListener('click', () => pindah(idxCerita - 1));
+elNext.addEventListener('click', () => pindah(idxCerita + 1));
+
+elSlider.addEventListener('input', () => {
+  rate = parseFloat(elSlider.value);
+  elSliderLbl.textContent = rate.toFixed(1) + 'x';
+});
+
+/* ================= JALAN ================= */
+elSliderLbl.textContent = rate.toFixed(1) + 'x';
+render();
+window.addEventListener('beforeunload', () => { if (synth) synth.cancel(); });
+</script>
+</body>
+</html>
